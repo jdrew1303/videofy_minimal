@@ -1,6 +1,8 @@
 # Videofy Minimal
 
-Videofy Minimal is a local tool for turning news articles into short videos for external screens.
+![Videofy CMS screenshot](./videofy_cms.png)
+
+Videofy Minimal is a local tool for turning news articles into short videos for external screens with human in the loop.
 
 It fetches article content, generates a short manuscript, matches visuals, produces narration, and renders a final video through a review flow in the CMS UI.
 
