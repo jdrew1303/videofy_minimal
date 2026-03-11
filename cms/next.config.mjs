@@ -13,8 +13,8 @@ const nextConfig = {
     },
   },
   serverExternalPackages: [
-    "@remotion/bundler",
-    "@remotion/renderer",
+    "@revideo/renderer",
+    "@revideo/core",
     "@rspack/core",
     "@rspack/binding",
     "esbuild",

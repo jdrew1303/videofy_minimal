@@ -1,7 +1,7 @@
-import { Player as RemotionPlayer, type PlayerRef } from "@remotion/player";
-import { forwardRef, type CSSProperties } from "react";
+/** @jsxImportSource react */
+import { Player as RevideoPlayer } from "@revideo/player-react";
+import { useMemo } from "react";
 import type { z } from "zod";
-import { ArticlesSeries } from "./ArticlesSeries";
 import {
   VIDEO_FPS,
   VIDEO_HEIGHT,
@@ -10,57 +10,52 @@ import {
 } from "./types/constants";
 import type { processedManuscriptSchema } from "@videofy/types";
 import { playerSchema } from "@videofy/types";
-import { getFullDuration } from "./utils/timestamps";
+import project from "./project";
 
 type PlayerConfig = z.infer<typeof playerSchema>;
 
-interface Props {
+export interface PlayerProps {
   manuscripts: Array<z.infer<typeof processedManuscriptSchema>>;
   width?: number;
   height?: number;
   voice?: boolean;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
   playerConfig?: PlayerConfig;
+  onPlayerReady?: (player: any) => void;
 }
 
-export const Player = forwardRef<PlayerRef, Props>(
-  (
+export const Player = (
     {
       manuscripts,
       height = VIDEO_HEIGHT,
       width = VIDEO_WIDTH,
       voice = true,
       playerConfig = defaultPlayerConfig,
-      ...rest
-    },
-    ref
+      onPlayerReady,
+    }: PlayerProps
   ) => {
-    const totalDuration = getFullDuration({
-      manuscripts,
-      playerConfig,
-    });
-
-    if (totalDuration === 0) return <div {...rest} />;
+    const variables = useMemo(
+      () => ({
+        manuscripts,
+        voice,
+        playerConfig,
+        width,
+        height,
+      }),
+      [manuscripts, voice, playerConfig, width, height]
+    );
 
     return (
-      <RemotionPlayer
-        ref={ref}
-        component={ArticlesSeries}
-        inputProps={{
-          manuscripts,
-          voice,
-          playerConfig,
-        }}
-        durationInFrames={totalDuration}
+      <RevideoPlayer
+        project={project}
+        variables={variables}
+        width={width}
+        height={height}
         fps={VIDEO_FPS}
-        compositionHeight={height}
-        compositionWidth={width}
         controls
-        acknowledgeRemotionLicense
-        {...rest}
+        onPlayerReady={onPlayerReady}
       />
     );
-  }
-);
+  };
 
 Player.displayName = "Player";

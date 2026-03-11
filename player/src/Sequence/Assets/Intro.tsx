@@ -1,25 +1,26 @@
-import { OffthreadVideo, Sequence, useVideoConfig } from "remotion";
+/** @jsxImportSource @revideo/2d/lib */
 import { z } from "zod";
-import { FC } from "react";
 import { customCutsSchema } from "@videofy/types";
+import { useScene } from "@revideo/core";
+import { Video } from "@revideo/2d";
 
 interface Props {
-  asset: z.infer<typeof customCutsSchema>; // Changed type
+  asset: z.infer<typeof customCutsSchema>;
   introDuration: number;
 }
 
-export const Intro: FC<Props> = ({ asset, introDuration }) => {
-  const { width, height } = useVideoConfig();
+export const Intro = ({ asset }: Props) => {
+  const width = useScene().variables.get("width", 1080)();
+  const height = useScene().variables.get("height", 1920)();
   const isPortrait = height > width;
 
   return (
-    <Sequence durationInFrames={introDuration} premountFor={10}>
-      {/* Reverted to use portrait/landscape from asset */}
-      {isPortrait ? (
-        <OffthreadVideo transparent src={asset.portrait} />
-      ) : (
-        <OffthreadVideo transparent src={asset.landscape} />
-      )}
-    </Sequence>
+    <Video
+      src={isPortrait ? asset.portrait : asset.landscape}
+      width={"100%"}
+      height={"100%"}
+      play={true}
+      {...({objectFit: "cover"} as any)}
+    />
   );
 };

@@ -1,7 +1,7 @@
-import { Audio, Sequence } from "remotion";
+/** @jsxImportSource @revideo/2d/lib */
 import { processedManuscriptSchema } from "@videofy/types";
 import { z } from "zod";
-import { FC } from "react";
+import { Audio } from "@revideo/2d";
 
 interface Props {
   manuscripts: Array<z.infer<typeof processedManuscriptSchema>>;
@@ -9,13 +9,11 @@ interface Props {
   volume?: number;
 }
 
-export const BackgroundMusic: FC<Props> = ({ backgroundMusic, volume }) => {
+export const BackgroundMusic = ({ backgroundMusic }: Props) => {
   if (!backgroundMusic) {
     return null;
   }
   return (
-    <Sequence>
-      <Audio src={backgroundMusic} volume={volume} loop />
-    </Sequence>
+    <Audio src={backgroundMusic} play={true} loop={true} />
   );
 };
