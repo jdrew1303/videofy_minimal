@@ -8,7 +8,7 @@ It fetches article content, generates a short manuscript, matches visuals, produ
 
 Here is an example video from one of our brands: [example_video_e24.mp4](./example_video_e24.mp4)
 
-This repository is designed to run on a laptop with only OpenAI and ElevenLabs credentials. It keeps the core workflow, but leaves out most of the internal integrations and infrastructure used in Schibsted's full Videofy setup.
+This repository is designed to run entirely locally on a laptop using local LLMs and TTS models (such as IBM Granite and Orpheus via LM Studio). It keeps the core workflow, but leaves out most of the internal integrations and infrastructure used in Schibsted's full Videofy setup.
 
 Found a problem or want to chat about the project? Open an issue or join our [Discord server](https://discord.gg/vFvvdC3B)
 
@@ -31,7 +31,7 @@ flowchart LR
   CMS --> Preview[Preview player<br/>Revideo]
   CMS --> Render[Local renderer]
 
-  API --> AI[OpenAI / ElevenLabs]
+  API --> AI[Local Models<br/>LM Studio / Orpheus]
   API --> Projects[Project files<br/>projects/<projectId>/]
   Fetchers --> Projects
 
@@ -60,7 +60,9 @@ You also need:
 cp .env.example .env
 ```
 
-Add your API credentials in `.env`:
+By default, Videofy Minimal uses local models. Ensure you have [LM Studio](https://lmstudio.ai/) or a compatible server running at `http://localhost:1234/v1`.
+
+If you wish to use cloud providers instead, add your API credentials in `.env`:
 - `OPENAI_API_KEY`
 - `ELEVENLABS_API_KEY`
 
@@ -95,7 +97,7 @@ To run the CMS and API in containers instead:
 docker compose up --build
 ```
 
-Docker Compose reads the same local `.env` file for values such as `OPENAI_API_KEY` and `ELEVENLABS_API_KEY`.
+Docker Compose reads the same local `.env` file. It is configured to reach LM Studio on your host machine via `host.docker.internal`.
 
 Open:
 - CMS: `http://127.0.0.1:3000`
@@ -162,7 +164,7 @@ Brands are configured in `brands/*.json`.
 
 A brand controls the look, voice, and generation behavior, including:
 - prompts
-- OpenAI models (`manuscriptModel`, `mediaModel`)
+- LLM models (`manuscriptModel`, `mediaModel`)
 - voice + TTS defaults
 - logo
 - intro/wipe/outro assets
