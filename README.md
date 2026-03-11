@@ -28,7 +28,7 @@ flowchart LR
 
   CMS --> Fetchers[Fetcher plugins<br/>fetchers/*]
   CMS --> API[Data API<br/>FastAPI]
-  CMS --> Preview[Preview player<br/>Remotion]
+  CMS --> Preview[Preview player<br/>Revideo]
   CMS --> Render[Local renderer]
 
   API --> AI[OpenAI / ElevenLabs]
@@ -177,9 +177,9 @@ To add a new brand:
 
 ## Player
 
-Rendering is built with [Remotion](https://www.remotion.dev/).
+Rendering is built with [Revideo](https://re.video/).
 
-This project uses Remotion for composition and local rendering. For commercial use, verify that your usage complies with Remotion license terms. You might need a license. 
+This project uses Revideo for composition and local rendering.
 
 ## Hotspot Model
 

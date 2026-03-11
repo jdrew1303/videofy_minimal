@@ -21,12 +21,10 @@
     "tsup": "^8.5.1"
   },
   "dependencies": {
-    "@remotion/animation-utils": "^4.0.433",
-    "@remotion/google-fonts": "^4.0.433",
-    "@remotion/player": "^4.0.433",
+    "@revideo/2d": "0.10.4",
+    "@revideo/core": "0.10.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "remotion": "^4.0.433",
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {

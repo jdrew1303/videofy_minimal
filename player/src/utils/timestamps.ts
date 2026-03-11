@@ -1,20 +1,15 @@
 import type { z } from "zod";
-import { VIDEO_FPS } from "../types/constants";
 import { processedManuscriptSchema, playerSchema } from "@videofy/types";
-// z is imported on line 1
-
-type PlayerConfig = z.infer<typeof playerSchema>;
 import {
   getSelectedReporterIntro,
   getSelectedReporterOutro,
 } from "./findSelectedReporterVideo";
 
+type PlayerConfig = z.infer<typeof playerSchema>;
 type Manuscript = z.infer<typeof processedManuscriptSchema>;
 
 export const roundToNearestFrame = (time: number) => {
-  const rounded = Math.round(time * VIDEO_FPS);
-
-  return rounded;
+  return time; // Revideo uses seconds
 };
 
 export const getSegmentDuration = (manuscript: Manuscript) => {
@@ -37,7 +32,7 @@ export const getSegmentDuration = (manuscript: Manuscript) => {
     return totalLength + segmentLength;
   }, 0);
 
-  return roundToNearestFrame(segmentDuration);
+  return segmentDuration;
 };
 
 interface GetFullDurationArgs {
@@ -49,24 +44,20 @@ export const getFullDuration = ({
   manuscripts,
   playerConfig,
 }: GetFullDurationArgs) => {
-  const introDuration = roundToNearestFrame(playerConfig.intro?.duration ?? 0);
-  const introOffset = roundToNearestFrame(playerConfig.intro?.offset ?? 0);
+  const introDuration = playerConfig.intro?.duration ?? 0;
+  const introOffset = playerConfig.intro?.offset ?? 0;
 
   const selectedReporterIntro = getSelectedReporterIntro(playerConfig);
-  const reporterIntroDuration = roundToNearestFrame(
-    selectedReporterIntro?.duration ?? 0
-  );
+  const reporterIntroDuration = selectedReporterIntro?.duration ?? 0;
 
-  const wipeDuration = roundToNearestFrame(playerConfig.wipe?.duration ?? 0);
-  const wipeOffset = roundToNearestFrame(playerConfig.wipe?.offset ?? 0);
+  const wipeDuration = playerConfig.wipe?.duration ?? 0;
+  const wipeOffset = playerConfig.wipe?.offset ?? 0;
 
   const selectedReporterOutro = getSelectedReporterOutro(playerConfig);
-  const reporterOutroDuration = roundToNearestFrame(
-    selectedReporterOutro?.duration ?? 0
-  );
+  const reporterOutroDuration = selectedReporterOutro?.duration ?? 0;
 
-  const outroDuration = roundToNearestFrame(playerConfig.outro?.duration ?? 0);
-  const outroOffset = roundToNearestFrame(playerConfig.outro?.offset ?? 0);
+  const outroDuration = playerConfig.outro?.duration ?? 0;
+  const outroOffset = playerConfig.outro?.offset ?? 0;
 
   const intro = introDuration + introOffset;
 
@@ -82,7 +73,7 @@ export const getFullDuration = ({
   if (!segments)
     return intro + reporterIntroDuration + wipe + reporterOutroDuration + outro;
 
-  const durationInFrames =
+  const totalDuration =
     intro +
     reporterIntroDuration +
     wipe * numberOfWipes +
@@ -90,5 +81,5 @@ export const getFullDuration = ({
     outro +
     segments.reduce((a, b) => a + b, 0);
 
-  return durationInFrames;
+  return totalDuration;
 };

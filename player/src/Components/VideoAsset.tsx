@@ -1,30 +1,21 @@
-import { FC } from "react";
+/** @jsxImportSource @revideo/2d/lib */
 import { videoSchema } from "@videofy/types";
 import { z } from "zod";
-import { OffthreadVideo, Video } from "remotion";
-import { roundToNearestFrame } from "../utils/timestamps";
+import { Video } from "@revideo/2d";
 
 interface Props {
   asset: z.infer<typeof videoSchema>;
   volume: number;
 }
 
-const VideoAsset: FC<Props> = ({ asset, volume = 0 }) => {
+const VideoAsset = ({ asset }: Props) => {
   return (
     <Video
       src={asset.url}
-      startFrom={asset?.startFrom && roundToNearestFrame(asset.startFrom)}
-      endAt={asset?.endAt && roundToNearestFrame(asset.endAt)}
-      loop
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-        objectPosition: "center",
-        transformOrigin: "center",
-      }}
-      volume={volume}
-      pauseWhenBuffering={true}
+      width={"100%"}
+      height={"100%"}
+      play={true}
+      {...({objectFit: "cover"} as any)}
     />
   );
 };

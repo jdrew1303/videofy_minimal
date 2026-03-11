@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    "jsxImportSource": "@revideo/2d/lib",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,7 +13,8 @@
     "outDir": "dist",
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "react": ["../node_modules/@revideo/2d/lib/jsx-runtime"]
     }
   },
   "include": ["src"],

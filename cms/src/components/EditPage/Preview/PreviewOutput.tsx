@@ -1,7 +1,7 @@
 "use client";
 import type { processedManuscriptSchema } from "@videofy/types";
 import { processManuscript } from "@/utils/processManuscript";
-import type { PlayerRef } from "@remotion/player";
+import type { Player as RevideoPlayer } from "@revideo/core";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useReactive } from "ahooks";
 import type { z } from "zod";
@@ -33,7 +33,7 @@ const PreviewOutput = ({ tabs }: { tabs: Tab[] }) => {
     generationId,
   } = useGlobalState();
 
-  const playerRef = useRef<PlayerRef>(null);
+  const playerRef = useRef<RevideoPlayer>(null);
 
   const handleError = useCallback(
     (error: unknown) => {
@@ -79,7 +79,7 @@ const PreviewOutput = ({ tabs }: { tabs: Tab[] }) => {
         setProcessedManuscripts(
           results.filter((result) => result !== null) as Array<Result>
         );
-        if (playerRef.current) playerRef.current.seekTo(0);
+        if (playerRef.current) playerRef.current.requestSeek(0);
       } catch (error) {
         handleError(error);
       } finally {
@@ -96,7 +96,7 @@ const PreviewOutput = ({ tabs }: { tabs: Tab[] }) => {
 
   const updatePreview = async () => {
     if (playerRef.current) {
-      playerRef.current.pause();
+      playerRef.current.togglePlayback(false);
     }
     await fetchData(true);
     await fetch("/api/generations", {
@@ -111,7 +111,7 @@ const PreviewOutput = ({ tabs }: { tabs: Tab[] }) => {
   useEffect(() => {
     if (initialized.current) return;
     if (playerRef.current) {
-      playerRef.current.pause();
+      playerRef.current.togglePlayback(false);
     }
 
     fetchData();
@@ -138,7 +138,7 @@ const PreviewOutput = ({ tabs }: { tabs: Tab[] }) => {
         <>
           <div className="relative">
             <Player
-              ref={playerRef}
+              onPlayerReady={(player) => (playerRef.current = player)}
               height={state.previewType === "Vertical" ? 1920 : 1080}
               width={state.previewType === "Vertical" ? 1080 : 1920}
               manuscripts={processedManuscripts}

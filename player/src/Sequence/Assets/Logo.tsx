@@ -1,27 +1,11 @@
-import { Sequence } from "remotion";
-import { FC } from "react";
-import { cssStringToReactStyle } from "../../utils/cssStringToReactStyle";
+/** @jsxImportSource @revideo/2d/lib */
+import { Img } from "@revideo/2d";
 
 interface Props {
   logo: string;
   logoStyle: string;
 }
 
-export const Logo: FC<Props> = ({ logo, logoStyle }) => {
-  const parsedStyle = cssStringToReactStyle(logoStyle || "top: 90px; right: 65px;");
-  const hasSize =
-    typeof parsedStyle.width !== "undefined" ||
-    typeof parsedStyle.height !== "undefined" ||
-    typeof parsedStyle.maxWidth !== "undefined";
-
-  const style: React.CSSProperties = {
-    position: "absolute",
-    ...parsedStyle,
-    ...(hasSize ? {} : { width: "96px" }),
-  };
-  const StyledLogo: FC = () => {
-    return <img src={logo} style={style} alt="Logo" />;
-  };
-
-  return <Sequence>{<StyledLogo />}</Sequence>;
+export const Logo = ({ logo }: Props) => {
+  return <Img src={logo} width={96} position={[400, -800]} />; // rough positioning
 };

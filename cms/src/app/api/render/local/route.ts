@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { playerSchema, processedManuscriptSchema } from "@videofy/types";
 import { z } from "zod";
-import { renderProjectVideo } from "@/lib/remotionRender";
+import { renderProjectVideo } from "@/lib/revideoRender";
 
 export const runtime = "nodejs";
 

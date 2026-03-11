@@ -1,24 +1,26 @@
-import type { FC } from "react";
-import { Sequence, Video, useVideoConfig } from "remotion";
+/** @jsxImportSource @revideo/2d/lib */
 import type { z } from "zod";
-import { reporterVideoSchema } from "@videofy/types"; // Explicitly use reporterVideoSchema
+import { reporterVideoSchema } from "@videofy/types";
+import { useScene } from "@revideo/core";
+import { Video } from "@revideo/2d";
 
 interface Props {
-  asset: z.infer<typeof reporterVideoSchema>; // Use the correct schema for inference
+  asset: z.infer<typeof reporterVideoSchema>;
   duration: number;
 }
 
-export const ReporterVideo: FC<Props> = ({ asset, duration }) => {
-  const { width, height } = useVideoConfig();
+export const ReporterVideo = ({ asset }: Props) => {
+  const width = useScene().variables.get("width", 1080)();
+  const height = useScene().variables.get("height", 1920)();
   const isPortrait = height > width;
 
   return (
-    <Sequence durationInFrames={duration}>
-      {isPortrait ? (
-        <Video src={asset.portrait} />
-      ) : (
-        <Video src={asset.landscape} />
-      )}
-    </Sequence>
+    <Video
+      src={isPortrait ? asset.portrait : asset.landscape}
+      width={"100%"}
+      height={"100%"}
+      play={true}
+      {...({objectFit: "cover"} as any)}
+    />
   );
 };
