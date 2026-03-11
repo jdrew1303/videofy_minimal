@@ -6,10 +6,10 @@ The brand file must stay valid JSON. Regular JSON comments are not supported by 
 
 ## Sections
 
-- `openai`: Model choices for manuscript generation and media placement.
+- `openai`: Model choices for manuscript generation and media placement. Now uses local models like IBM Granite via LM Studio.
 - `options`: Small brand-level behavior overrides such as segment pause timing.
 - `exportDefaults`: Default toggle values shown in the download/export UI.
-- `people`: Voice and TTS defaults for generated narration.
+- `people`: Voice and TTS defaults for generated narration. Now uses local models like Orpheus via LM Studio.
 - `prompts`: Brand-specific prompt instructions used during manuscript and placement generation.
 - `player`: Visual identity, logo, transitions, colors, and optional background music.
 

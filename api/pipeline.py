@@ -21,7 +21,7 @@ from .schemas import (
     TextLine,
 )
 from .settings import Settings
-from .tts_service import ElevenLabsService
+from .tts_service import LocalTTSService
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ class PipelineService:
         settings: Settings,
         store: ProjectStore,
         llm_service: LLMService,
-        tts_service: ElevenLabsService,
+        tts_service: LocalTTSService,
         config_resolver: ConfigResolver,
         asset_analysis_service: AssetAnalysisService,
     ):

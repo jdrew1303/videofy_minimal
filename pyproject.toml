@@ -10,7 +10,9 @@ dependencies = [
   "pydantic>=2.10.0,<3",
   "pydantic-settings>=2.7.0,<3",
   "openai>=2.24.0,<3",
-  "elevenlabs>=2.38.0,<3",
+  "snac>=1.2.1",
+  "soundfile>=0.13.1",
+  "torch>=2.10.0",
 ]
 
 [dependency-groups]
