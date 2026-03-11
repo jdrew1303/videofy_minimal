@@ -59,3 +59,35 @@ INFO:     Application startup complete.
  GET / 200 in 144ms (compile: 10ms, render: 134ms)
  GET /api/brands 200 in 16ms (compile: 5ms, render: 11ms)
  GET /api/fetchers 200 in 31ms (compile: 4ms, render: 28ms)
+WARNING:  StatReload detected changes in '.venv/lib/python3.12/site-packages/cuda/pathfinder/_version.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [5533]
+INFO:     Started server process [10867]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'api/tts_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10867]
+INFO:     Started server process [11040]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'tests/test_tts_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11040]
+INFO:     Started server process [11048]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'api/tts_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11048]
+INFO:     Started server process [11332]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

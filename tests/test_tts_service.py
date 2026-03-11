@@ -1,25 +1,38 @@
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import api.tts_service as tts_module
 
 
-class FakeSpeechResponse:
-    def stream_to_file(self, path):
-        path.write_bytes(b"abc")
+class FakeMessage:
+    def __init__(self, content):
+        self.content = content
 
 
-class FakeSpeechAPI:
+class FakeChoice:
+    def __init__(self, content):
+        self.message = FakeMessage(content)
+
+
+class FakeResponse:
+    def __init__(self, content):
+        self.choices = [FakeChoice(content)]
+
+
+class FakeChatCompletions:
     def __init__(self):
-        self.calls: list[dict] = []
+        self.calls = []
 
     def create(self, **kwargs):
         self.calls.append(kwargs)
-        return FakeSpeechResponse()
+        # Return 7 dummy audio tokens repeated to make a valid reshape(-1, 7)
+        tokens = " ".join(["<custom_token_1>"] * 7)
+        return FakeResponse(tokens)
 
 
-class FakeAudioAPI:
+class FakeChat:
     def __init__(self):
-        self.speech = FakeSpeechAPI()
+        self.completions = FakeChatCompletions()
 
 
 class FakeOpenAIClient:
@@ -28,12 +41,27 @@ class FakeOpenAIClient:
     def __init__(self, api_key: str, base_url: str):
         self.api_key = api_key
         self.base_url = base_url
-        self.audio = FakeAudioAPI()
+        self.chat = FakeChat()
         FakeOpenAIClient.last_instance = self
 
 
-def test_tts_service_calls_local_tts_create_with_voice_id(monkeypatch, tmp_path: Path):
+def test_tts_service_calls_local_tts_orpheus_style(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(tts_module, "OpenAI", FakeOpenAIClient)
+
+    # Mock SNAC model and soundfile
+    mock_snac = MagicMock()
+    mock_snac_instance = MagicMock()
+    mock_snac.from_pretrained.return_value = mock_snac_instance
+    mock_snac_instance.decode.return_value = [MagicMock()]
+    mock_snac_instance.parameters.return_value = iter([MagicMock(device="cpu")])
+    monkeypatch.setattr("snac.SNAC", mock_snac)
+
+    mock_sf = MagicMock()
+    monkeypatch.setattr("soundfile.write", mock_sf)
+
+    # Mock subprocess.run for ffmpeg
+    mock_run = MagicMock()
+    monkeypatch.setattr("subprocess.run", mock_run)
 
     service = tts_module.LocalTTSService(
         api_key="test-api-key",
@@ -53,10 +81,12 @@ def test_tts_service_calls_local_tts_create_with_voice_id(monkeypatch, tmp_path:
 
     client = FakeOpenAIClient.last_instance
     assert client is not None
-    assert len(client.audio.speech.calls) == 1
+    assert len(client.chat.completions.calls) == 1
 
-    payload = client.audio.speech.calls[0]
-    assert payload["voice"] == "brand-voice-id"
+    payload = client.chat.completions.calls[0]
     assert payload["model"] == "custom-model"
-    assert payload["input"] == "Hei verden"
-    assert out.read_bytes() == b"abc"
+    assert "brand-voice-id" in payload["messages"][0]["content"]
+    assert "Hei verden" in payload["messages"][0]["content"]
+
+    assert mock_sf.called
+    assert mock_run.called
