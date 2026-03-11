@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    def __init__(self, api_key: str, model: str):
+    def __init__(self, api_key: str, model: str, base_url: str | None = None):
         self._api_key = api_key
         self._model = model
-        self._client = OpenAI(api_key=api_key) if api_key else None
+        self._client = OpenAI(api_key=api_key, base_url=base_url)
 
     def summarize_into_lines(
         self,
@@ -23,12 +23,8 @@ class LLMService:
         system_prompt: str,
         model_override: str | None = None,
     ) -> list[str]:
-        if not self._api_key:
-            raise ValueError(
-                "OPENAI_API_KEY is required to summarize article text when script_lines are not provided"
-            )
         if self._client is None:
-            raise ValueError("OpenAI client is not initialized")
+            raise ValueError("LLM client is not initialized")
 
         logger.info(
             "[llm] Requesting script summary with model '%s' (title=%r, text_chars=%d)",

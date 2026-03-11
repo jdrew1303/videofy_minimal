@@ -1,8 +1,8 @@
 {
   "brand_name": "Default",
   "openai": {
-    "manuscriptModel": "gpt-4o",
-    "mediaModel": "gpt-4o"
+    "manuscriptModel": "granite-3.0-8b-instruct",
+    "mediaModel": "granite-3.0-8b-instruct"
   },
   "options": {
     "segmentPauseSeconds": 0.4
@@ -16,12 +16,8 @@
   },
   "people": {
     "default": {
-      "voice": "h9K1sOblwDPp0OVDDPUJ",
-      "model_id": "eleven_turbo_v2_5",
-      "stability": 0.5,
-      "similarity_boost": 0.8,
-      "style": 0,
-      "use_speaker_boost": true
+      "voice": "alloy",
+      "model_id": "orpheus-3b-0.1-ft-GGUF"
     }
   },
   "prompts": {

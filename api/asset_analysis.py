@@ -173,11 +173,12 @@ class AssetAnalysisService:
         openai_api_key: str,
         ffmpeg_bin: str,
         ffprobe_bin: str,
+        base_url: str | None = None,
     ):
         self._store = store
         self._ffmpeg_bin = ffmpeg_bin
         self._ffprobe_bin = ffprobe_bin
-        self._client = OpenAI(api_key=openai_api_key) if openai_api_key else None
+        self._client = OpenAI(api_key=openai_api_key, base_url=base_url)
 
     def analyze(
         self,

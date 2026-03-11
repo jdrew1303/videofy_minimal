@@ -5,62 +5,48 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-try:
-    from elevenlabs import VoiceSettings
-    from elevenlabs.client import ElevenLabs
-except ImportError:  # pragma: no cover - backward compatibility
-    from elevenlabs import VoiceSettings
-    from elevenlabs import ElevenLabs
+from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 
 
-class ElevenLabsService:
-    def __init__(self, api_key: str, voice_id: str, ffprobe_bin: str, ffmpeg_bin: str):
+class LocalTTSService:
+    def __init__(self, api_key: str, model_id: str, base_url: str, ffprobe_bin: str, ffmpeg_bin: str):
         self._api_key = api_key
-        self._voice_id = voice_id
+        self._model_id = model_id
+        self._base_url = base_url
         self._ffprobe_bin = ffprobe_bin
         self._ffmpeg_bin = ffmpeg_bin
-        self._client = ElevenLabs(api_key=self._api_key) if self._api_key else None
+        self._client = OpenAI(api_key=api_key, base_url=base_url)
 
     def synthesize_line(
         self,
         text: str,
         output_mp3: Path,
         voice_id: str | None = None,
-        model_id: str = "eleven_turbo_v2_5",
+        model_id: str | None = None,
         voice_settings: dict[str, Any] | None = None,
     ) -> None:
         if not self._client:
-            raise ValueError("ELEVENLABS_API_KEY is required for manuscript processing")
+            raise ValueError("TTS client is not initialized")
 
         output_mp3.parent.mkdir(parents=True, exist_ok=True)
-        payload: dict[str, Any] = {
-            "voice_id": voice_id or self._voice_id,
-            "model_id": model_id,
-            "output_format": "mp3_44100_128",
-            "text": text,
-        }
-        if voice_settings:
-            try:
-                payload["voice_settings"] = VoiceSettings(**voice_settings)
-            except Exception:
-                payload["voice_settings"] = voice_settings
+
+        target_model = model_id or self._model_id
 
         logger.info(
-            "Calling ElevenLabs text_to_speech.convert with voice_id=%s model_id=%s",
-            payload["voice_id"],
-            model_id,
+            "Calling local TTS synthesis with model_id=%s",
+            target_model,
         )
-        audio_stream = self._client.text_to_speech.convert(**payload)
 
-        with output_mp3.open("wb") as handle:
-            if isinstance(audio_stream, (bytes, bytearray)):
-                handle.write(audio_stream)
-            else:
-                for chunk in audio_stream:
-                    if chunk:
-                        handle.write(chunk)
+        # Using OpenAI-compatible speech endpoint
+        response = self._client.audio.speech.create(
+            model=target_model,
+            voice=voice_id or "alloy", # voice_id might be used as 'voice' in OpenAI spec
+            input=text,
+        )
+
+        response.stream_to_file(output_mp3)
 
     def get_duration_seconds(self, audio_file: Path) -> float:
         cmd = [

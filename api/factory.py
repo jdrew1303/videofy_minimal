@@ -15,7 +15,7 @@ from .llm_service import LLMService
 from .pipeline import PipelineService
 from .project_store import ProjectStore
 from .settings import Settings, get_settings
-from .tts_service import ElevenLabsService
+from .tts_service import LocalTTSService
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -25,10 +25,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     store = ProjectStore(settings.projects_root_abs)
     resolver = ConfigResolver(settings.config_root_abs)
-    llm = LLMService(api_key=settings.openai_api_key, model=settings.openai_model)
-    tts = ElevenLabsService(
-        api_key=settings.elevenlabs_api_key,
-        voice_id="",
+    llm = LLMService(
+        api_key=settings.openai_api_key,
+        model=settings.openai_model,
+        base_url=settings.lm_studio_base_url,
+    )
+    tts = LocalTTSService(
+        api_key=settings.openai_api_key,
+        model_id=settings.tts_model,
+        base_url=settings.lm_studio_base_url,
         ffprobe_bin=settings.ffprobe_bin,
         ffmpeg_bin=settings.ffmpeg_bin,
     )
@@ -37,6 +42,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openai_api_key=settings.openai_api_key,
         ffmpeg_bin=settings.ffmpeg_bin,
         ffprobe_bin=settings.ffprobe_bin,
+        base_url=settings.lm_studio_base_url,
     )
 
     pipeline = PipelineService(

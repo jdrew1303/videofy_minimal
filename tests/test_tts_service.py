@@ -3,30 +3,42 @@ from pathlib import Path
 import api.tts_service as tts_module
 
 
-class FakeTextToSpeechAPI:
+class FakeSpeechResponse:
+    def stream_to_file(self, path):
+        path.write_bytes(b"abc")
+
+
+class FakeSpeechAPI:
     def __init__(self):
         self.calls: list[dict] = []
 
-    def convert(self, **kwargs):
+    def create(self, **kwargs):
         self.calls.append(kwargs)
-        return [b"abc"]
+        return FakeSpeechResponse()
 
 
-class FakeElevenLabsClient:
+class FakeAudioAPI:
+    def __init__(self):
+        self.speech = FakeSpeechAPI()
+
+
+class FakeOpenAIClient:
     last_instance = None
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, base_url: str):
         self.api_key = api_key
-        self.text_to_speech = FakeTextToSpeechAPI()
-        FakeElevenLabsClient.last_instance = self
+        self.base_url = base_url
+        self.audio = FakeAudioAPI()
+        FakeOpenAIClient.last_instance = self
 
 
-def test_tts_service_calls_elevenlabs_convert_with_voice_id(monkeypatch, tmp_path: Path):
-    monkeypatch.setattr(tts_module, "ElevenLabs", FakeElevenLabsClient)
+def test_tts_service_calls_local_tts_create_with_voice_id(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(tts_module, "OpenAI", FakeOpenAIClient)
 
-    service = tts_module.ElevenLabsService(
+    service = tts_module.LocalTTSService(
         api_key="test-api-key",
-        voice_id="fallback-voice",
+        model_id="default-model",
+        base_url="http://localhost:1234/v1",
         ffprobe_bin="ffprobe",
         ffmpeg_bin="ffmpeg",
     )
@@ -36,18 +48,15 @@ def test_tts_service_calls_elevenlabs_convert_with_voice_id(monkeypatch, tmp_pat
         text="Hei verden",
         output_mp3=out,
         voice_id="brand-voice-id",
-        model_id="eleven_multilingual_v2",
-        voice_settings={"stability": 1.0, "similarity_boost": 1.0},
+        model_id="custom-model",
     )
 
-    client = FakeElevenLabsClient.last_instance
+    client = FakeOpenAIClient.last_instance
     assert client is not None
-    assert len(client.text_to_speech.calls) == 1
+    assert len(client.audio.speech.calls) == 1
 
-    payload = client.text_to_speech.calls[0]
-    assert payload["voice_id"] == "brand-voice-id"
-    assert payload["model_id"] == "eleven_multilingual_v2"
-    assert payload["text"] == "Hei verden"
-    assert payload["output_format"] == "mp3_44100_128"
-    assert "voice_settings" in payload
+    payload = client.audio.speech.calls[0]
+    assert payload["voice"] == "brand-voice-id"
+    assert payload["model"] == "custom-model"
+    assert payload["input"] == "Hei verden"
     assert out.read_bytes() == b"abc"

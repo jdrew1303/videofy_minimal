@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     projects_root: Path = Field(default=Path("projects"))
     config_root: Path = Field(default=Path("brands"))
 
-    openai_api_key: str = ""
-    openai_model: str = "gpt-4o-mini"
-
-    elevenlabs_api_key: str = ""
+    openai_api_key: str = "not-needed"
+    openai_model: str = "granite-3.0-8b-instruct"
+    lm_studio_base_url: str = "http://localhost:1234/v1"
+    tts_model: str = "orpheus-3b-0.1-ft-GGUF"
 
     ffmpeg_bin: str = "ffmpeg"
     ffprobe_bin: str = "ffprobe"

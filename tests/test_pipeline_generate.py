@@ -8,13 +8,13 @@ from api.llm_service import LLMService
 from api.pipeline import PipelineService
 from api.project_store import ProjectStore
 from api.settings import Settings
-from api.tts_service import ElevenLabsService
+from api.tts_service import LocalTTSService
 
 
 def write_brand_config(config_root: Path) -> None:
     config_root.mkdir(parents=True, exist_ok=True)
     (config_root / "default.json").write_text(
-        '{"openai":{"manuscriptModel":"gpt-4o-mini","mediaModel":"gpt-4o"},"options":{"segmentPauseSeconds":0.4},"prompts":{"scriptPrompt":"Return JSON with lines."},"people":{"default":{"voice":"brand-voice-id","model_id":"eleven_turbo_v2_5"}},"player":{"defaultCameraMovements":["pan-left","zoom-out"]}}',
+        '{"openai":{"manuscriptModel":"gpt-4o-mini","mediaModel":"gpt-4o"},"options":{"segmentPauseSeconds":0.4},"prompts":{"scriptPrompt":"Return JSON with lines."},"people":{"default":{"voice":"brand-voice-id","model_id":"orpheus-3b-0.1-ft-GGUF"}},"player":{"defaultCameraMovements":["pan-left","zoom-out"]}}',
         encoding="utf-8",
     )
 
@@ -55,9 +55,10 @@ def test_generate_manuscript_uses_script_lines_from_article(tmp_path: Path):
         settings=settings,
         store=store,
         llm_service=LLMService(api_key="", model="gpt-4o-mini"),
-        tts_service=ElevenLabsService(
+        tts_service=LocalTTSService(
             api_key="",
-            voice_id="voice",
+            model_id="voice",
+            base_url="http://localhost:1234/v1",
             ffprobe_bin="ffprobe",
             ffmpeg_bin="ffmpeg",
         ),
@@ -137,9 +138,10 @@ def test_generate_recomputes_analysis_on_each_run(tmp_path: Path):
         settings=settings,
         store=store,
         llm_service=LLMService(api_key="", model="gpt-4o-mini"),
-        tts_service=ElevenLabsService(
+        tts_service=LocalTTSService(
             api_key="",
-            voice_id="voice",
+            model_id="voice",
+            base_url="http://localhost:1234/v1",
             ffprobe_bin="ffprobe",
             ffmpeg_bin="ffmpeg",
         ),
@@ -263,9 +265,10 @@ def test_generate_wires_video_scenes_into_segment_trims(tmp_path: Path):
         settings=settings,
         store=store,
         llm_service=LLMService(api_key="", model="gpt-4o-mini"),
-        tts_service=ElevenLabsService(
+        tts_service=LocalTTSService(
             api_key="",
-            voice_id="voice",
+            model_id="voice",
+            base_url="http://localhost:1234/v1",
             ffprobe_bin="ffprobe",
             ffmpeg_bin="ffmpeg",
         ),
